@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Sign-Up Today!</title>
+
+	<!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+	<!-- LINK TO FIREBASE GOES HERE -->
+	<script src="https://cdn.firebase.com/js/client/2.4.1/firebase.js"></script>
+
+</head>
+<body>
+
+<div class="container">
+
+	<br>
+
+	<!-- Jumbotron -->
+	<div class="jumbotron">
+		<h1 class="text-center">Sign-Up Today!</h1>
+	</div>
+
+	<div class="row">
+
+		<!-- Sign-Up Panel-->
+		<div class="col-lg-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">New Member Sign-Up</h3>
+				</div>
+				<div class="panel-body">
+
+					<!-- Sign-up Form (note the various input "types")-->
+					<form role="form">
+					  <div class="form-group">
+					    <label for="text">Name:</label>
+					    <input type="text" class="form-control" id="nameinput">
+					  </div>
+					  <div class="form-group">
+					    <label for="text">Email:</label>
+					    <input type="email" class="form-control" id="emailinput">
+					  </div>
+					  <div class="form-group">
+					    <label for="text">Age:</label>
+					    <input type="number" class="form-control" id="ageinput">
+					  </div>
+					  <div class="form-group">
+						 <label for="comment">How did you hear about us?</label>
+						 <textarea class="form-control" rows="5" id="commentinput"></textarea>
+					   </div>
+					  <button type="submit" class="btn btn-default" id="addUser">Submit</button>
+					</form>
+
+				</div>
+			</div>
+		</div>
+
+		<!-- Most Recent Member Panel -->
+		<div class="col-lg-6">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">Most Recent Member</h3>
+				</div>
+				<div class="panel-body" id="recentMember">
+					<h2 id="namedisplay"></h2>
+					<h4 id="emaildisplay"></h4>
+					<h4 id="agedisplay"></h4>
+					<p id="commentdisplay"></p>
+				</div>
+			</div>
+		</div>
+
+		<!-- Wells for displaying all users -->
+		<div class="col-lg-12">
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">All Members</h3>
+				</div>
+				<div class="panel-body">
+						<div id="full-member-list"></div>
+
+
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Latest compiled and minified CSS & JS -->
+<script src="https://code.jquery.com/jquery.js"></script>
+
+<script>
+// ========================================== START CODING BELOW!!
+// Firebase link
+var url ='https://recentusernames.firebaseio.com/'
+var dataRef = new Firebase(url);
+// Initial Values
+var name = "";
+var email = "";
+var age = 0;
+var comment = "";
+// Capture Button Click
+$("#addUser").on("click", function() {
+	// YOUR TASK!!!
+	// Code in the logic for storing and retrieving the most recent user.
+	// Dont forget to provide initial data to your Firebase database.
+	name = $('#nameinput').val().trim();
+	email = $('#emailinput').val().trim();
+	age = $('#ageinput').val().trim();
+	comment = $('#commentinput').val().trim();
+
+
+	// Code for the push
+	dataRef.push({
+		name: name,
+		email: email,
+		age: age,
+		comment: comment,
+		dateAdded: Firebase.ServerValue.TIMESTAMP
+	})
+	// Don't refresh the page!
+	return false;
+});
+
+//Firebase watcher + initial loader HINT: This code behaves similarly to .on("value")
+dataRef.on("child_added", function(childSnapshot) {
+	// Log everything that's coming out of snapshot
+	console.log(childSnapshot.val().name);
+	console.log(childSnapshot.val().name);
+	console.log(childSnapshot.val().email);
+	console.log(childSnapshot.val().age);
+	console.log(childSnapshot.val().comment);
+	console.log(childSnapshot.val().joinDate)
+
+	// full list of items to the well
+
+		$('#full-member-list').append("<div class='well'><span id='name'> "+childSnapshot.val().name+" </span><span id='email'> "+childSnapshot.val().email+" </span><span id='age'> "+childSnapshot.val().age+" </span><span id='comment'> "+childSnapshot.val().comment+" </span></div>")
+
+
+// Handle the errors
+}, function(errorObject){
+	//console.log("Errors handled: " + errorObject.code)
+});
+
+dataRef.orderByChild("dateAdded").limitToLast(1).on("child_added", function(snapshot){
+	// Change the HTML to reflect
+	$("#namedisplay").html(snapshot.val().name);
+	$("#emaildisplay").html(snapshot.val().email);
+	$("#agedisplay").html(snapshot.val().age);
+	$("#commentdisplay").html(snapshot.val().comment);
+})
+
+
+</script>
+
+</body>
+</html>
